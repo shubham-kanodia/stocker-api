@@ -9,6 +9,12 @@ import requests
 from time import sleep
 from collection.dao import DAO
 from collection.data_collection import DataCollection
+from db.crud_operations import CRUDOperations
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from config import Config
 from tqdm import tqdm
 
 file_name = "res/stock_list.csv"
@@ -38,28 +44,39 @@ for elem in symbols_data:
 def get_symbol_screener_id(symbol):
     response = requests.get(f"https://www.screener.in/api/company/search/?q={symbol}").json()
     symbol_id = response[0]["id"]
-    return symbol_id
+    symbol = response[0]["url"].split("/")[2]
+    return symbol, symbol_id
 
 
 screener_id_dict = {}
 
 for elem in tqdm(symbols_data):
     try:
-        symbol_id = get_symbol_screener_id(elem[0])
-        screener_id_dict[elem[0]] = symbol_id
+        symbol, symbol_id = get_symbol_screener_id(elem[0])
+        screener_id_dict[symbol] = symbol_id
 
         sleep(0.1)
     except:
         try:
-            symbol_id = get_symbol_screener_id(elem[0])
-            screener_id_dict[elem[0]] = symbol_id
+            symbol, symbol_id = get_symbol_screener_id(elem[0])
+            screener_id_dict[symbol] = symbol_id
 
             sleep(0.1)
         except:
             print(f"Skipped symbol: [{elem[0]}]")
 
-with open("res/screener_ids.json", "w") as f:
+with open("res/screener_ids_main.json", "w") as f:
     json.dump(screener_id_dict, f, indent=2)
 
-data_collection = DataCollection()
-data_collection.collect_all_symbols_screener_prices()
+config = Config()
+engine = create_engine(config.db_path)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+db_session = SessionLocal()
+
+crud_ops = CRUDOperations(db_session)
+id_data = json.load(open("res/screener_ids_main.json", "r"))
+
+crud_ops.add_screener_ids(id_data)
+
+# data_collection = DataCollection()
+# data_collection.collect_all_symbols_screener_prices()
