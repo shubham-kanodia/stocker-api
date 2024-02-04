@@ -385,14 +385,15 @@ class Fetcher:
             if dataset["metric"] == "Price":
                 values = dataset["values"]
         export_data = {value[0]: value[1] for value in values}
+
         dao.add_screener_price_data(stock_symbol, export_data)
 
 
 class DataCollection:
     """Handle multiple tickers' collection"""
 
-    def __init__(self):
-        self.dao = DAO()
+    def __init__(self, crud_ops):
+        self.dao = DAO(crud_ops)
         self.fetcher = Fetcher()
         self.all_symbols = self.dao.get_symbols()
 

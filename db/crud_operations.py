@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
-from db.models import ScreenerIDS
+from db.models import ScreenerIDS, Prices
+from datetime import datetime, timedelta
 
 
 def handle_exception(func):
@@ -30,3 +30,70 @@ class CRUDOperations:
 
         self.db.add_all(records)
         self.db.commit()
+
+    @handle_exception
+    def get_screener_id(self, symbol: str):
+        record = self.db.query(ScreenerIDS) \
+            .filter(ScreenerIDS.symbol == symbol).first()
+
+        return record
+
+    @handle_exception
+    def get_all_symbols(self):
+        records = self.db.query(ScreenerIDS).all()
+        symbols = [_.symbol for _ in records]
+
+        return symbols
+
+    @handle_exception
+    def get_symbol_prices(self, symbol: str):
+        records = self.db.query(Prices).filter(Prices.symbol == symbol).all()
+        date_price_data = {record.date: record.price for record in records}
+        return date_price_data
+
+    @handle_exception
+    def add_symbol_prices(self, symbol: str, date_price_dict):
+        existing_symbol_price_dates = set(self.get_symbol_prices(symbol).keys())
+        revised_date_price_data = {}
+
+        for date in date_price_dict:
+            if date not in existing_symbol_price_dates:
+                revised_date_price_data[date] = date_price_dict[date]
+
+        records = []
+        for date, price in revised_date_price_data.items():
+            record = Prices(
+                symbol=symbol,
+                date=date,
+                price=price
+            )
+            records.append(record)
+
+        if len(records):
+            self.db.add_all(records)
+            self.db.commit()
+
+    @handle_exception
+    def get_most_recent_price(self, symbol):
+        def get_last_working_day(day):
+
+            if day.weekday() == 6:
+                last_working_day = day - timedelta(days=2)
+            elif day.weekday() == 5:
+                last_working_day = day - timedelta(days=1)
+            else:
+                last_working_day = day
+
+            return last_working_day.strftime("%Y-%m-%d")
+
+        today = datetime.now()
+        last_working_day = str(get_last_working_day(today))
+        record = self.db.query(Prices) \
+            .where((Prices.symbol == symbol) & (Prices.date == last_working_day)).first()
+
+        if not record:
+            last_working_day = str(get_last_working_day(today - timedelta(days=1)))
+            record = self.db.query(Prices) \
+                .where((Prices.symbol == symbol) & (Prices.date == last_working_day)).first()
+
+        return record.price if record else None

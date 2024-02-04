@@ -6,9 +6,12 @@ from datetime import datetime
 from pymongo import MongoClient
 from collection.config import CONFIG
 
+from db.crud_operations import CRUDOperations
+
 
 class DAO:
-    def __init__(self):
+    def __init__(self, crud_ops: CRUDOperations):
+        self.crud_ops = crud_ops
         cluster = MongoClient(CONFIG.MONGO_URI)
         _db = cluster["stocker"]
         self.collection_stock_names = _db["stock_names"]
@@ -26,8 +29,7 @@ class DAO:
         self.screener_id_dict = json.load(open(path, "rb"))
 
     def get_symbols(self):
-        results = self.collection_stock_names.find()
-        return [result["_id"] for result in results]
+        return self.crud_ops.get_all_symbols()
 
     def add_symbol(self, symbol, data):
         if self.collection_stock_names.find_one({"_id": symbol}):
@@ -44,11 +46,7 @@ class DAO:
             self.collection_stock_prices.insert_one(data)
 
     def add_screener_price_data(self, symbol, data):
-        if self.collection_screener_prices.find_one({"_id": symbol}):
-            self.collection_screener_prices.update_one({"_id": symbol}, {"$set": data})
-        else:
-            data["_id"] = symbol
-            self.collection_screener_prices.insert_one(data)
+        self.crud_ops.add_symbol_prices(symbol, data)
 
     def get_stock_data(self, symbol):
         return self.collection_stock_prices.find({"_id": symbol})[0]
