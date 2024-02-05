@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  prod:
+    image: stocker/api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - api/data/.env.local
