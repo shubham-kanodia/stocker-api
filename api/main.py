@@ -39,4 +39,4 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": f"Welcome to Stocker"}
+    return {"message": f"Welcome to Stocker!"}
