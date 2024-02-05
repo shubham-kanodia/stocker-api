@@ -31,20 +31,6 @@ class DAO:
     def get_symbols(self):
         return self.crud_ops.get_all_symbols()
 
-    def add_symbol(self, symbol, data):
-        if self.collection_stock_names.find_one({"_id": symbol}):
-            self.collection_stock_names.update_one({"_id": symbol}, {"$set": data})
-        else:
-            data["_id"] = symbol
-            self.collection_stock_names.insert_one(data)
-
-    def add_data(self, symbol, data):
-        if self.collection_stock_prices.find_one({"_id": symbol}):
-            self.collection_stock_prices.update_one({"_id": symbol}, {"$set": data})
-        else:
-            data["_id"] = symbol
-            self.collection_stock_prices.insert_one(data)
-
     def add_screener_price_data(self, symbol, data):
         self.crud_ops.add_symbol_prices(symbol, data)
 

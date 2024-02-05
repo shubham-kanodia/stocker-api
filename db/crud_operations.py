@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from db.models import ScreenerIDS, Prices
+from db.models import ScreenerIDS, Prices, Logs
 from datetime import datetime, timedelta
 
 
@@ -69,6 +69,14 @@ class CRUDOperations:
             )
             records.append(record)
 
+        # Update today's price
+        date_today = str(datetime.now().strftime("%Y-%m-%d"))
+        today_record = self.db.query(Prices) \
+            .where((Prices.symbol == symbol) & (Prices.date == date_today)).first()
+        if today_record and date_today in date_price_dict:
+            today_record.price = date_price_dict[date_today]
+            self.db.commit()
+
         if len(records):
             self.db.add_all(records)
             self.db.commit()
@@ -97,3 +105,12 @@ class CRUDOperations:
                 .where((Prices.symbol == symbol) & (Prices.date == last_working_day)).first()
 
         return record.price if record else None
+
+    @handle_exception
+    def add_log(self, log: str):
+        record = Logs(
+            log=log
+        )
+
+        self.db.add(record)
+        self.db.commit()

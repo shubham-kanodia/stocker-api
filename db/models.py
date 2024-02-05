@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, Boolean, Float
+from sqlalchemy import Column, String, Integer, Boolean, Float, TIMESTAMP
+from datetime import datetime
 
 from db.database import Base
 
@@ -18,3 +19,12 @@ class Prices(Base):
     symbol = Column(String, nullable=False, index=True)
     date = Column(String, nullable=False)
     price = Column(Float)
+
+
+class Logs(Base):
+    __tablename__ = "logs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+
+    time = Column('timestamp', TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
+    log = Column(String, nullable=False)
