@@ -369,7 +369,7 @@ class Fetcher:
 
     @staticmethod
     def export_screener_10k_prices(stock_symbol, dao):
-        screener_id = dao.get_screener_id(stock_symbol)
+        screener_id = str(dao.get_screener_id(stock_symbol))
         url = CONFIG.SCREENER_PRICE_URL.replace("COMPANY_SCREENER_ID", screener_id)
         headers = {
             "authority": "www.screener.in",

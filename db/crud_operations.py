@@ -36,7 +36,7 @@ class CRUDOperations:
         record = self.db.query(ScreenerIDS) \
             .filter(ScreenerIDS.symbol == symbol).first()
 
-        return record
+        return record.id if record else None
 
     @handle_exception
     def get_all_symbols(self):

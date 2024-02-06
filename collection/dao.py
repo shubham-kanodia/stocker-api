@@ -10,3 +10,6 @@ class DAO:
 
     def add_screener_price_data(self, symbol, data):
         self.crud_ops.add_symbol_prices(symbol, data)
+
+    def get_screener_id(self, symbol: str):
+        return self.crud_ops.get_screener_id(symbol)
