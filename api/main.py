@@ -61,9 +61,12 @@ async def add_to_watchlist(inp: WatchlistInput):
 async def get_watchlist():
     try:
         symbols_and_prices = crud_ops.get_watchlist()
+        current_prices = crud_ops.get_most_recent_prices_of_all_symbols()
+
         return Watchlist(
-            symbols=[WatchListElement(symbol=symbol, price=price) for symbol, price in symbols_and_prices]
+            symbols=[WatchListElement(symbol=symbol, added_price=price, current_price=current_prices[symbol]) for symbol, price in symbols_and_prices if symbol in current_prices]
         )
 
     except Exception as exp:
+        print(exp)
         return NotOK

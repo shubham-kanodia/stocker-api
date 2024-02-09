@@ -8,7 +8,8 @@ class Message(BaseModel):
 
 class WatchListElement(BaseModel):
     symbol: str
-    price: float
+    added_price: float
+    current_price: float
 
 
 class Watchlist(BaseModel):

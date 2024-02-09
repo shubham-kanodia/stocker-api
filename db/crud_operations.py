@@ -107,6 +107,31 @@ class CRUDOperations:
         return record.price if record else None
 
     @handle_exception
+    def get_most_recent_prices_of_all_symbols(self):
+        def get_last_working_day(day):
+
+            if day.weekday() == 6:
+                last_working_day = day - timedelta(days=2)
+            elif day.weekday() == 5:
+                last_working_day = day - timedelta(days=1)
+            else:
+                last_working_day = day
+
+            return last_working_day.strftime("%Y-%m-%d")
+
+        today = datetime.now()
+        last_working_day = str(get_last_working_day(today))
+        records = self.db.query(Prices) \
+            .where((Prices.date == last_working_day)).all()
+
+        if not len(records):
+            last_working_day = str(get_last_working_day(today - timedelta(days=1)))
+            records = self.db.query(Prices) \
+                .where((Prices.date == last_working_day)).all()
+
+        return {record.symbol: record.price for record in records}
+
+    @handle_exception
     def add_log(self, log: str):
         record = Logs(
             log=log
