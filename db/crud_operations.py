@@ -119,7 +119,7 @@ class CRUDOperations:
     def add_to_watchlist(self, symbol, price):
         current_watchlist = self.get_watchlist()
 
-        if symbol not in current_watchlist:
+        if symbol not in [_[0] for _ in current_watchlist]:
 
             record = Watchlist(
                 symbol=symbol,
