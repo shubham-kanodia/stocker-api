@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from db.models import ScreenerIDS, Prices, Logs
+from db.models import ScreenerIDS, Prices, Logs, Watchlist
 from datetime import datetime, timedelta
 
 
@@ -114,3 +114,29 @@ class CRUDOperations:
 
         self.db.add(record)
         self.db.commit()
+
+    @handle_exception
+    def add_to_watchlist(self, symbol, price):
+        current_watchlist = self.get_watchlist()
+
+        if symbol not in current_watchlist:
+
+            record = Watchlist(
+                symbol=symbol,
+                price=price
+            )
+
+            self.db.add(record)
+            self.db.commit()
+
+        else:
+            record = self.db.query(Watchlist).filter(Watchlist.symbol == symbol).first()
+            record.price = price
+
+            self.db.commit()
+
+    @handle_exception
+    def get_watchlist(self):
+        records = self.db.query(Watchlist).all()
+
+        return [(record.symbol, record.price) for record in records]

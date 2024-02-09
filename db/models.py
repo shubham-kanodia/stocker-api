@@ -21,6 +21,14 @@ class Prices(Base):
     price = Column(Float)
 
 
+class Watchlist(Base):
+    __tablename__ = "watchlist"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    symbol = Column(String, nullable=False)
+    price = Column(Float)
+
+
 class Logs(Base):
     __tablename__ = "logs"
 

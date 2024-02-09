@@ -13,6 +13,9 @@ from config import Config
 from collection.data_collection import DataCollection
 from tasks.main import run_all_tasks
 
+from api.models.inputs import *
+from api.models.outputs import *
+
 app = FastAPI()
 
 config = Config()
@@ -24,9 +27,9 @@ crud_ops = CRUDOperations(db_session)
 
 data_collection = DataCollection(crud_ops)
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(run_all_tasks, trigger='interval', hours=1, args=[data_collection, crud_ops])
-scheduler.start()
+# scheduler = BackgroundScheduler()
+# scheduler.add_job(run_all_tasks, trigger='interval', hours=1, args=[data_collection, crud_ops])
+# scheduler.start()
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,3 +43,27 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {"message": f"Welcome to Stocker!"}
+
+
+@app.post("/watchlist/add")
+async def add_to_watchlist(inp: WatchlistInput):
+    try:
+        current_price = crud_ops.get_most_recent_price(inp.symbol)
+        crud_ops.add_to_watchlist(inp.symbol, current_price)
+
+        return OK
+
+    except Exception as exp:
+        return NotOK
+
+
+@app.get("/watchlist")
+async def get_watchlist():
+    try:
+        symbols_and_prices = crud_ops.get_watchlist()
+        return Watchlist(
+            symbols=[WatchListElement(symbol=symbol, price=price) for symbol, price in symbols_and_prices]
+        )
+
+    except Exception as exp:
+        return NotOK
