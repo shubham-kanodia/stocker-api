@@ -27,9 +27,9 @@ crud_ops = CRUDOperations(db_session)
 
 data_collection = DataCollection(crud_ops)
 
-# scheduler = BackgroundScheduler()
-# scheduler.add_job(run_all_tasks, trigger='interval', hours=1, args=[data_collection, crud_ops])
-# scheduler.start()
+scheduler = BackgroundScheduler()
+scheduler.add_job(run_all_tasks, trigger='interval', hours=1, args=[data_collection, crud_ops])
+scheduler.start()
 
 app.add_middleware(
     CORSMiddleware,
