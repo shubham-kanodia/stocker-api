@@ -38,6 +38,18 @@ class Notifications(Base):
     batch = Column(Integer)
 
 
+class TopWinners(Base):
+    __tablename__ = "top_winners"
+    symbol = Column(String, primary_key=True, nullable=False, unique=True)
+    change = Column(Float, nullable=False)
+
+
+class TopLosers(Base):
+    __tablename__ = "top_losers"
+    symbol = Column(String, primary_key=True, nullable=False, unique=True)
+    change = Column(Float, nullable=False)
+
+
 class Logs(Base):
     __tablename__ = "logs"
 

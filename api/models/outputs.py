@@ -25,5 +25,14 @@ class WatchlistNotifications(BaseModel):
     notifications: List[WatchlistNotification]
 
 
+class PriceChange(BaseModel):
+    symbol: str
+    price_change: float
+
+
+class PriceChanges(BaseModel):
+    stocks: List[PriceChange]
+
+
 OK = Message(message="OK")
 NotOK = Message(message="Failed")

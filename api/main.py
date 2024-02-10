@@ -83,3 +83,29 @@ async def get_watchlist_notifications():
 
     except Exception as exp:
         return NotOK
+
+
+@app.get("/winners")
+async def get_recent_winners():
+    try:
+        winners = crud_ops.get_winners()
+
+        return PriceChanges(
+            stocks=[PriceChange(symbol=symbol, price_change=price_change) for symbol, price_change in winners]
+        )
+
+    except Exception as exp:
+        return NotOK
+
+
+@app.get("/losers")
+async def get_recent_losers():
+    try:
+        losers = crud_ops.get_losers()
+
+        return PriceChanges(
+            stocks=[PriceChange(symbol=symbol, price_change=price_change) for symbol, price_change in losers]
+        )
+
+    except Exception as exp:
+        return NotOK

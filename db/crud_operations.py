@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from db.models import ScreenerIDS, Prices, Logs, Watchlist, Notifications
+from db.models import ScreenerIDS, Prices, Logs, Watchlist, Notifications, TopWinners, TopLosers
 from datetime import datetime, timedelta
 
 
@@ -196,3 +196,45 @@ class CRUDOperations:
     def get_all_prices(self):
         records = self.db.query(Prices).all()
         return records
+
+    @handle_exception
+    def add_losers(self, losers):
+        self.db.query(TopLosers).delete()
+        self.db.commit()
+
+        records = []
+        for symbol, change in losers:
+            record = TopLosers(
+                symbol=symbol,
+                change=change
+            )
+            records.append(record)
+
+        self.db.add_all(records)
+        self.db.commit()
+
+    @handle_exception
+    def add_winners(self, winners):
+        self.db.query(TopWinners).delete()
+        self.db.commit()
+
+        records = []
+        for symbol, change in winners:
+            record = TopWinners(
+                symbol=symbol,
+                change=change
+            )
+            records.append(record)
+
+        self.db.add_all(records)
+        self.db.commit()
+
+    @handle_exception
+    def get_winners(self):
+        records = self.db.query(TopWinners).all()
+        return [(record.symbol, record.change) for record in records]
+
+    @handle_exception
+    def get_losers(self):
+        records = self.db.query(TopLosers).all()
+        return [(record.symbol, record.change) for record in records]
