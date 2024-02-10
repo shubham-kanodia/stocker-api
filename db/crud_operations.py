@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from db.models import ScreenerIDS, Prices, Logs, Watchlist
+from sqlalchemy import func
+from db.models import ScreenerIDS, Prices, Logs, Watchlist, Notifications
 from datetime import datetime, timedelta
 
 
@@ -165,3 +166,21 @@ class CRUDOperations:
         records = self.db.query(Watchlist).all()
 
         return [(record.symbol, record.price) for record in records]
+
+    @handle_exception
+    def add_notifications(self, notifications):
+        records = []
+
+        max_batch = self.db.query(Notifications).query(Notifications.batch, func.max(Notifications.batch))
+        batch_id = max_batch.batch + 1
+
+        for symbol, message in notifications.items():
+            record = Notifications(
+                symbol=symbol,
+                message=message,
+                batch=batch_id
+            )
+            records.append(record)
+
+        self.db.add_all(records)
+        self.db.commit()

@@ -29,6 +29,15 @@ class Watchlist(Base):
     price = Column(Float)
 
 
+class Notifications(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    symbol = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    batch = Column(Integer)
+
+
 class Logs(Base):
     __tablename__ = "logs"
 
