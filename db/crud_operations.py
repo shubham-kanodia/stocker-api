@@ -171,10 +171,10 @@ class CRUDOperations:
     def add_notifications(self, notifications):
         records = []
 
-        max_batch = self.db.query(Notifications).query(Notifications.batch, func.max(Notifications.batch))
-        batch_id = max_batch.batch + 1
+        max_batch = self.db.query(func.max(Notifications.batch)).all()[0][0]
+        batch_id = max_batch + 1
 
-        for symbol, message in notifications.items():
+        for symbol, message in notifications:
             record = Notifications(
                 symbol=symbol,
                 message=message,
@@ -184,3 +184,15 @@ class CRUDOperations:
 
         self.db.add_all(records)
         self.db.commit()
+
+    @handle_exception
+    def get_recent_watchlist_notifications(self):
+        max_batch = self.db.query(func.max(Notifications.batch)).all()[0][0]
+        records = self.db.query(Notifications).filter(Notifications.batch == max_batch).all()
+
+        return [(record.symbol, record.message) for record in records]
+
+    @handle_exception
+    def get_all_prices(self):
+        records = self.db.query(Prices).all()
+        return records

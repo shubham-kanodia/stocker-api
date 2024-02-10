@@ -1,25 +1,3 @@
-"""
-Should notify user when (Priority increases downwards):
-
--   Stock is rallying upwards and has been rising for more than 2 days
--   Stock in watchlist falls below 5%
--   Stock in watchlist has been falling since more than 2 days
-
-Later (Maybes)
-
--   Stock has a golden crossover
-"""
-
-
-"""
-Notifications about general stocks:
-
--   Stocks that have been falling for max number of days
--   Stocks that have been rising for max number of days
-
-"""
-
-
 class PriceNotificationsChecker:
     def __init__(self):
         self.threshold = 4.0
@@ -84,8 +62,3 @@ class PriceNotificationsChecker:
         total_percentage_increment = (prices[len(prices) - 1] - prices[len(prices) - 1 - num_of_days]) * 100 / prices[len(prices) - 1 - num_of_days]
 
         return num_of_days, total_percentage_increment
-
-
-# if __name__ == "main":
-pnc = PriceNotificationsChecker()
-print(pnc.falling_days([10, 7, 5, 4, 3]))

@@ -70,3 +70,16 @@ async def get_watchlist():
     except Exception as exp:
         print(exp)
         return NotOK
+
+
+@app.get("/watchlist/notifications")
+async def get_watchlist_notifications():
+    try:
+        notifications = crud_ops.get_recent_watchlist_notifications()
+
+        return WatchlistNotifications(
+            notifications=[WatchlistNotification(symbol=symbol, message=message) for symbol, message in notifications]
+        )
+
+    except Exception as exp:
+        return NotOK
