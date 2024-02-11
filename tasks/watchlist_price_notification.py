@@ -75,9 +75,12 @@ def generate_price_notifications(crud_ops: CRUDOperations):
     notifications = []
 
     for symbol in symbols:
-        prices = get_symbol_prices(records, symbol)
-        symbol_notification = get_symbol_notifications(symbol, prices, pnc)
+        try:
+            prices = get_symbol_prices(records, symbol)
+            symbol_notification = get_symbol_notifications(symbol, prices, pnc)
 
-        notifications.extend(symbol_notification)
+            notifications.extend(symbol_notification)
+        except Exception as exp:
+            print(f"[SKIPPED] {symbol}")
 
     crud_ops.add_notifications(notifications)
