@@ -82,9 +82,14 @@ async def get_watchlist(token: str = Depends(oauth2_scheme)):
 
 
 @app.get("/watchlist/notifications")
-async def get_watchlist_notifications():
+async def get_watchlist_notifications(token: str = Depends(oauth2_scheme)):
     try:
-        notifications = crud_ops.get_recent_watchlist_notifications()
+        user_details = auth_utils.decode_token(token)
+        all_notifications = crud_ops.get_recent_notifications()
+        watchlist = crud_ops.get_watchlist(user_details.username)
+
+        watchlist_symbols = set([_[0] for _ in watchlist])
+        notifications = [notification for notification in all_notifications if notification[0] in watchlist_symbols]
 
         return WatchlistNotifications(
             notifications=[WatchlistNotification(symbol=symbol, message=message) for symbol, message in notifications]

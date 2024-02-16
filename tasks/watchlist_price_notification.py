@@ -68,8 +68,7 @@ def get_symbol_notifications(symbol: str, prices, pnc: PriceNotificationsChecker
 def generate_price_notifications(crud_ops: CRUDOperations):
     pnc = PriceNotificationsChecker()
 
-    watchlist = crud_ops.get_watchlist()
-    symbols = [_[0] for _ in watchlist]
+    symbols = crud_ops.get_all_symbols()
     records = crud_ops.get_all_prices()
 
     notifications = []

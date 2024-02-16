@@ -184,7 +184,7 @@ class CRUDOperations:
         self.db.commit()
 
     @handle_exception
-    def get_recent_watchlist_notifications(self):
+    def get_recent_notifications(self):
         max_batch = self.db.query(func.max(Notifications.batch)).all()[0][0]
         records = self.db.query(Notifications).filter(Notifications.batch == max_batch).all()
 
