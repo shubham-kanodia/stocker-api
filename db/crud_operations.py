@@ -264,3 +264,13 @@ class CRUDOperations:
                 "last_name": user_record.last_name,
                 "email": user_record.email
             }
+
+    @handle_exception
+    def username_exists(self, username: str):
+        user_record = self.db.query(Users) \
+            .where(Users.username == username).first()
+
+        if user_record:
+            return True
+        else:
+            return False

@@ -151,3 +151,20 @@ async def signin(user_details: SignInInput):
 
     except Exception as exp:
         return NotOK
+
+
+@app.get("/account/username/{username}")
+async def check_username(username: str):
+    try:
+        exists = crud_ops.username_exists(username)
+        if exists:
+            return {
+                "exists": True
+            }
+        else:
+            return {
+                "exists": False
+            }
+
+    except Exception as exp:
+        return NotOK
