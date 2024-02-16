@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -29,6 +30,8 @@ crud_ops = CRUDOperations(db_session)
 data_collection = DataCollection(crud_ops)
 auth_utils = AuthUtils(config, crud_ops)
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(run_all_tasks, trigger='interval', hours=1, args=[data_collection, crud_ops])
 scheduler.start()
@@ -48,10 +51,12 @@ async def root():
 
 
 @app.post("/watchlist/add")
-async def add_to_watchlist(inp: WatchlistInput):
+async def add_to_watchlist(inp: WatchlistInput, token: str = Depends(oauth2_scheme)):
     try:
+        user_details = auth_utils.decode_token(token)
+
         current_price = crud_ops.get_most_recent_price(inp.symbol)
-        crud_ops.add_to_watchlist(inp.symbol, current_price)
+        crud_ops.add_to_watchlist(inp.symbol, current_price, user_details.username)
 
         return OK
 
@@ -60,9 +65,11 @@ async def add_to_watchlist(inp: WatchlistInput):
 
 
 @app.get("/watchlist")
-async def get_watchlist():
+async def get_watchlist(token: str = Depends(oauth2_scheme)):
     try:
-        symbols_and_prices = crud_ops.get_watchlist()
+        user_details = auth_utils.decode_token(token)
+
+        symbols_and_prices = crud_ops.get_watchlist(user_details.username)
         current_prices = crud_ops.get_most_recent_prices_of_all_symbols()
 
         return Watchlist(

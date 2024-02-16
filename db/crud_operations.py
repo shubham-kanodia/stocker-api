@@ -142,28 +142,26 @@ class CRUDOperations:
         self.db.commit()
 
     @handle_exception
-    def add_to_watchlist(self, symbol, price):
-        current_watchlist = self.get_watchlist()
+    def add_to_watchlist(self, symbol, price, username):
+        record = self.db.query(Watchlist).where((Watchlist.symbol == symbol) & (Watchlist.username == username)).first()
 
-        if symbol not in [_[0] for _ in current_watchlist]:
-
+        if not record:
             record = Watchlist(
                 symbol=symbol,
-                price=price
+                price=price,
+                username=username
             )
 
             self.db.add(record)
             self.db.commit()
 
         else:
-            record = self.db.query(Watchlist).filter(Watchlist.symbol == symbol).first()
             record.price = price
-
             self.db.commit()
 
     @handle_exception
-    def get_watchlist(self):
-        records = self.db.query(Watchlist).all()
+    def get_watchlist(self, username):
+        records = self.db.query(Watchlist).where(Watchlist.username == username).all()
 
         return [(record.symbol, record.price) for record in records]
 
