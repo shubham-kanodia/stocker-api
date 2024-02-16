@@ -3,7 +3,7 @@ import hashlib
 from jose import jwt
 from datetime import datetime, timedelta
 
-from models.inputs import User
+from api.models.inputs import User
 from db.crud_operations import CRUDOperations
 
 
