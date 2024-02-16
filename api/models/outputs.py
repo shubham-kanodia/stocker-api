@@ -34,5 +34,9 @@ class PriceChanges(BaseModel):
     stocks: List[PriceChange]
 
 
+class Token(BaseModel):
+    access_token: str
+
+
 OK = Message(message="OK")
 NotOK = Message(message="Failed")

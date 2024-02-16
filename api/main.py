@@ -12,6 +12,7 @@ from config import Config
 
 from collection.data_collection import DataCollection
 from tasks.main import run_all_tasks
+from api.auth import AuthUtils
 
 from api.models.inputs import *
 from api.models.outputs import *
@@ -26,6 +27,7 @@ db_session = SessionLocal()
 crud_ops = CRUDOperations(db_session)
 
 data_collection = DataCollection(crud_ops)
+auth_utils = AuthUtils(config, crud_ops)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(run_all_tasks, trigger='interval', hours=1, args=[data_collection, crud_ops])
@@ -106,6 +108,39 @@ async def get_recent_losers():
         return PriceChanges(
             stocks=[PriceChange(symbol=symbol, price_change=price_change) for symbol, price_change in losers]
         )
+
+    except Exception as exp:
+        return NotOK
+
+
+@app.post("/account/signup")
+async def signup(user_details: SignupInput):
+    try:
+        crud_ops.add_user(
+            user_details.username,
+            user_details.first_name,
+            user_details.last_name,
+            user_details.email,
+            auth_utils.hash_value(user_details.password)
+        )
+
+        return OK
+
+    except Exception as exp:
+        return NotOK
+
+
+@app.post("/account/signin")
+async def signin(user_details: SignInInput):
+    try:
+        password_hash = auth_utils.hash_value(user_details.password)
+        user_details = crud_ops.get_user(user_details.username, password_hash)
+        access_token = auth_utils.create_access_token(user_details)
+
+        if not user_details:
+            return NotOK
+        else:
+            return Token(access_token=access_token)
 
     except Exception as exp:
         return NotOK

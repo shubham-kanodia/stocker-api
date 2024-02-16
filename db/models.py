@@ -57,3 +57,14 @@ class Logs(Base):
 
     time = Column('timestamp', TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
     log = Column(String, nullable=False)
+
+
+class Users(Base):
+    __tablename__ = "users"
+
+    username = Column(String, primary_key=True, unique=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+
+    password_hash = Column(String, nullable=False)

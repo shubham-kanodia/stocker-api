@@ -17,6 +17,7 @@ jobs:
           touch ./data/.env
           echo DB_SERVER=${{ secrets.DB_SERVER }} >> ./data/.env
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> ./data/.env
+          echo AUTH_SECRET_KEY=${{ secrets.AUTH_SECRET_KEY }} >> ./data/.env
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

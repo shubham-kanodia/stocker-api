@@ -1,3 +1,7 @@
 db:
   user: "postgres"
   database: "stocksdb"
+
+auth:
+  algorithm: "HS256"
+  expiry_in_minutes: 4320

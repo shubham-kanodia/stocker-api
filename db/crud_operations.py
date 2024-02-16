@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from db.models import ScreenerIDS, Prices, Logs, Watchlist, Notifications, TopWinners, TopLosers
+from db.models import ScreenerIDS, Prices, Logs, Watchlist, Notifications, TopWinners, TopLosers, Users
 from datetime import datetime, timedelta
 
 
@@ -238,3 +238,31 @@ class CRUDOperations:
     def get_losers(self):
         records = self.db.query(TopLosers).all()
         return [(record.symbol, record.change) for record in records]
+
+    @handle_exception
+    def add_user(self, username, first_name, last_name, email, password_hash):
+        user_record = Users(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password_hash=password_hash
+        )
+
+        self.db.add(user_record)
+        self.db.commit()
+
+    @handle_exception
+    def get_user(self, username, password_hash):
+        user_record = self.db.query(Users) \
+            .where((Users.username == username) & (Users.password_hash == password_hash)).first()
+
+        if not user_record:
+            return None
+        else:
+            return {
+                "username": username,
+                "first_name": user_record.first_name,
+                "last_name": user_record.last_name,
+                "email": user_record.email
+            }

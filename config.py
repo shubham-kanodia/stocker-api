@@ -17,3 +17,7 @@ class Config:
     db_pass = os.getenv("DB_PASSWORD")
 
     db_path = f"postgresql://{db_user}:{db_pass}@{db_server}/{db_name}"
+
+    secret_key = os.getenv("AUTH_SECRET_KEY")
+    algorithm = source.get("auth.algorithm")
+    auth_expiry = source.get("auth.expiry_in_minutes")
